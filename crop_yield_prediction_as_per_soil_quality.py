@@ -7,17 +7,12 @@ Original file is located at
     https://colab.research.google.com/drive/1fetGervWaQM6D2V0hP0Qc3YCVJHIJ7aA
 """
 
-
-
-# for manipulation
 import numpy as npy
 import pandas as pd
 
-# for data manipulation
 import matplotlib.pyplot as plt
 import seaborn as sea
 
-# for interactivity
 from ipywidgets import interact
 import warnings
 warnings.filterwarnings("ignore")
@@ -25,20 +20,16 @@ warnings.filterwarnings("ignore")
 from google.colab import drive
 drive.mount('/content/drive')
 
-# Lets read the dataset
 data = pd.read_csv('/content/drive/MyDrive/data.csv')
 data.head()
 
-# Lets check the shape of the dataset
 print("Dataset shape is: ",data.shape)
 
-# lets check if there is any missing value n the column or not
 data.isnull().sum()
 
-# lets check the Crops present in this Dataset
-data['label'].value_counts()
 
-# lets check the summary for all the crops 
+data['label'].value_counts()
+ 
 
 print("Avg ratio of Nitrogen in the soil: {0:.2f}".format(data['N'].mean()))
 print("Avg ratio of Phosphoras in the soil: {0:.2f}".format(data['P'].mean()))
@@ -122,13 +113,13 @@ def compare(conditions=['N','P','K','temperature','ph','humidity','rainfall']):
     print("Pomegranate : {0:.2f}".format(data[(data['label']=='pomegranate')][conditions].mean()))
     print("Coffee : {0:.2f}".format(data[(data['label']=='coffee')][conditions].mean()))
 
-# lets make this function more intuitive
+
 
 @interact
 def compare(conditions =['N','P','K','temperature','ph','humidity','rainfall']):
     print("crops which require greater than average",conditions,'\n')
     print(data[data[conditions] > data[conditions].mean()]['label'].unique())
-    print("*****************")
+   
     print("crops which require less than average",conditions,'\n')
     print(data[data[conditions] <= data[conditions].mean()]['label'].unique())
 
@@ -172,15 +163,12 @@ plt.grid()
 
 plt.suptitle('distribution for agricultural condition ',fontsize=20)
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-# plt.set_figheight(15)
-# plt.set_figwidth(15)
+
 plt.figure(figsize=(16, 8)) 
 plt.show()
-
-##lets find out some intersting fact 
+ 
 print("some intersting patterns")
 
-print("*************************")
 print("crops which require very high ratio nitrogen content in soil:",data[data['N']>120]['label'].unique())
 print("crops which require very high ratio phosphorous content in soil:",data[data['P']>100]['label'].unique())
 print("crops which require very high ratio potassiun content in soil:",data[data['K']>200]['label'].unique())
@@ -191,73 +179,72 @@ print("crops which require very low humidity:",data[data['humidity']<20]['label'
 print("crops which require very low ph:",data[data['ph']<4]['label'].unique())
 print("crops which require very high ph:",data[data['ph']>9]['label'].unique())
 
-# lets understand whichcrops can only be grown in summer season,winter season and rainy season
 
 print("summer crops")
 print(data[(data['temperature']>30)&(data['humidity']>50)]['label'].unique())
 summer_crops = data[(data['temperature']>30)&(data['humidity']>50)]['label'].unique()
-print("***********************")
+
 print("winter crops")
 print(data[(data['temperature']<20)&(data['humidity']>30)]['label'].unique())
 winter_crops = data[(data['temperature']<20)&(data['humidity']>30)]['label'].unique()
-print("***********************")
+
 print("rainy crops")
 print(data[(data['rainfall']>200)&(data['humidity']>30)]['label'].unique())
 rainy_crops = data[(data['rainfall']>200)&(data['humidity']>30)]['label'].unique()
 
 
 
-# For bar graph
+
 fig, ax = plt.subplots()
 ax.bar(summer_crops," ")
-# The following commands add labels to our figure.
+
 plt.xlabel('Crops')
-# plt.ylabel('Values')
+
 plt.title("Best Crops for  Summer Season")
 fig.autofmt_xdate()
 plt.show()
 
-# For bar graph
+
 fig, ax = plt.subplots()
 ax.bar(winter_crops," ")
-# The following commands add labels to our figure.
+
 plt.xlabel('Crops')
-# plt.ylabel('Values')
+
 plt.title("Best Crops for  Winter Season")
 fig.autofmt_xdate()
 plt.show()
 
-# For bar graph
+
 fig, ax = plt.subplots()
 ax.bar(rainy_crops," ")
-# The following commands add labels to our figure.
+
 plt.xlabel('Crops')
-# plt.ylabel('Values')
+
 plt.title("Best Crops for  Rainy Season")
 fig.autofmt_xdate()
 plt.show()
 
 from sklearn.cluster import KMeans
-#removing the labels column
+
 x = data. drop(['label'],axis=1)
-#selecting all the values of the data
+
 x = x.values
-#checking the shape
+
 print(x.shape)
 
 
 
-#lets implements the K Means algorithms to perform clustering analysis
+
 km=KMeans(n_clusters=4,init='k-means++',max_iter=300,n_init=10,random_state=0)
 y_means=km.fit_predict(x)
 
-#lets find out the result
+
 a=data['label']
 y_means=pd.DataFrame(y_means)
 z=pd.concat([y_means,a],axis=1)
 z=z.rename(columns = {0:'cluster'})
 
-#lets check the clusters of each crops
+
 print("lets check the result after applying the K Means clusteing analysis \n")
 print("crops in first cluster :",z[z['cluster']==0]['label'].unique())
 print("#"*50)
@@ -267,7 +254,6 @@ print("crops in third cluster :",z[z['cluster']==2]['label'].unique())
 print("******************************************************")
 print("crops in fourth cluster :",z[z['cluster']==3]['label'].unique())
 
-#lets split the data set for predictive modeling
 
 y=data['label']
 x=data.drop(['label'],axis=1)
@@ -275,7 +261,7 @@ x=data.drop(['label'],axis=1)
 print("shape of x:",x.shape)
 print("shape of y:",y.shape)
 
-#lets create training and teting sets for validation of results
+
 from sklearn.model_selection import train_test_split
 x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2,random_state=0)
 
@@ -288,12 +274,10 @@ print("the shape of y test:", y_test.shape)
 
 
 
-#lets print Classification report also
+
 from sklearn.metrics import classification_report
 cr = classification_report(y_test, y_pred)
 print(cr)
-
-#LETS CHECK THE HEAD OF THE DATASET
 data.head()
 
 prediction=model.predict((npy.array([[88,40,40,18.8,84,8.5,200.9]])))
@@ -312,10 +296,10 @@ RainFall = 1019
 prediction=model.predict((npy.array([[N,P,K, Temprature, Humidity, PH, RainFall]])))                                    
 print("The suggested crop for given climatic conditions is:",prediction)
 
-# For bar graph
+
 fig, ax = plt.subplots()
 ax.bar(["Nitrogen","Phosphorus","Pottasium","Temprature "," Humidity","PH","RainFall"], [N,P,K,Temprature,Humidity,PH,RainFall])
-# The following commands add labels to our figure.
+
 plt.xlabel('input')
 plt.ylabel('Values')
 plt.title('Best Crop is ' + prediction + " for Given Set of Inputs")
